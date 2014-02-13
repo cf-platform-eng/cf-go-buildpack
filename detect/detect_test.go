@@ -42,7 +42,6 @@ var _ = Describe("Detect", func() {
 			It("should output 'go' to stdout", func() {
 				Detect(fakeWriter, buildDir)
 
-				Ω(tmpGoFile.Name()).To(Equal(buildDir + string(os.PathSeparator) + "hello.go"))
 				Ω(fakeWriter.buffer).To(Equal([]byte("go")))
 			})
 

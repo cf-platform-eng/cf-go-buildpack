@@ -20,7 +20,8 @@ func main() {
 			ShortName: "d",
 			Usage:     "is this a Go application?",
 			Action: func(c *cli.Context) {
-				detect.Detect(os.Stdout, c.Args()[0])
+				exit := detect.Detect(os.Stdout, c.Args()[0])
+				os.Exit(exit)
 			},
 		},
 		{
