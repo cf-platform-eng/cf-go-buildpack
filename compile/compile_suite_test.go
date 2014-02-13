@@ -1,4 +1,4 @@
-package compile_test
+package compile
 
 import (
 	. "github.com/onsi/ginkgo"

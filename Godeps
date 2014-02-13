@@ -9,6 +9,14 @@
 			"ImportPath": "github.com/codegangsta/cli",
 			"Comment": "1.0.0-33-g8242fd8",
 			"Rev": "8242fd818cfa92ef1393938524b2ea4e9e12b451"
+		},
+		{
+			"ImportPath": "github.com/onsi/ginkgo",
+			"Rev": "3bafcec253f65271566c4d05cb3e3f3b1a6cb2d1"
+		},
+		{
+			"ImportPath": "github.com/onsi/gomega",
+			"Rev": "930b4522e0d3027320b5d56f8a375796f2e376e5"
 		}
 	]
 }

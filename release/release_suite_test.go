@@ -1,4 +1,4 @@
-package release_test
+package release
 
 import (
 	. "github.com/onsi/ginkgo"
