@@ -2,26 +2,28 @@ package detect
 
 import (
 	"io"
-	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
 func Detect(writer io.Writer, buildDir string) int {
-	files, _ := ioutil.ReadDir(buildDir)
-	match := false
-	for _, file := range files {
-		// Godeps files
-		if strings.HasPrefix(strings.ToLower(file.Name()), "godeps") {
-			match = true
+	godeps := false
+	gofile := false
+	visit := func(path string, f os.FileInfo, err error) error {
+		if strings.ToLower(f.Name()) == "godeps" {
+			godeps = true
 		}
 
-		// .go files
-		if strings.HasSuffix(file.Name(), ".go") {
-			match = true
+		if strings.HasSuffix(f.Name(), ".go") {
+			gofile = true
 		}
+		return nil
 	}
 
-	if match {
+	filepath.Walk(buildDir, visit)
+
+	if gofile || godeps {
 		io.WriteString(writer, "Go")
 		return 0
 	}
