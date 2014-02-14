@@ -8,12 +8,24 @@ import (
 
 func Detect(writer io.Writer, buildDir string) int {
 	files, _ := ioutil.ReadDir(buildDir)
+	match := false
 	for _, file := range files {
-		if strings.Contains(file.Name(), ".go") {
-			writer.Write([]byte("go"))
-			return 0
+		// Godeps files
+		if strings.HasPrefix(strings.ToLower(file.Name()), "godeps") {
+			match = true
+		}
+
+		// .go files
+		if strings.HasSuffix(file.Name(), ".go") {
+			match = true
 		}
 	}
-	writer.Write([]byte(""))
+
+	if match {
+		io.WriteString(writer, "Go")
+		return 0
+	}
+
+	io.WriteString(writer, "No Go")
 	return 1
 }

@@ -1,4 +1,4 @@
-package release_test
+package buildpack_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestRelease(t *testing.T) {
+func TestBuildpack(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Release Suite")
+	RunSpecs(t, "Buildpack Suite")
 }

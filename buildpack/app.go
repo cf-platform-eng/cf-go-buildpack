@@ -1,16 +1,17 @@
-package main
+package buildpack
 
 import (
+	"bytes"
+	"fmt"
 	"os"
 
 	"github.com/cf-platform-eng/cf-go-buildpack/compile"
 	"github.com/cf-platform-eng/cf-go-buildpack/detect"
 	"github.com/cf-platform-eng/cf-go-buildpack/release"
-
 	"github.com/codegangsta/cli"
 )
 
-func main() {
+func CreateApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "cf_go_buildpack"
 	app.Usage = "Run your Go applications on Cloud Foundry!"
@@ -20,7 +21,9 @@ func main() {
 			ShortName: "d",
 			Usage:     "is this a Go application?",
 			Action: func(c *cli.Context) {
-				exit := detect.Detect(os.Stdout, c.Args()[0])
+				b := new(bytes.Buffer)
+				exit := detect.Detect(b, c.Args()[0])
+				fmt.Println(b)
 				os.Exit(exit)
 			},
 		},
@@ -42,5 +45,5 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	return app
 }

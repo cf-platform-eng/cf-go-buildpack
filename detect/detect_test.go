@@ -1,11 +1,11 @@
-package detect
+package detect_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"io/ioutil"
 	"os"
+	. "github.com/cf-platform-eng/cf-go-buildpack/detect"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 type FakeWriter struct {
@@ -39,10 +39,9 @@ var _ = Describe("Detect", func() {
 				defer tmpGoFile.Close()
 			})
 
-			It("should output 'go' to stdout", func() {
+			It("should output 'Go' to writer", func() {
 				Detect(fakeWriter, buildDir)
-
-				Ω(fakeWriter.buffer).To(Equal([]byte("go")))
+				Ω(string(fakeWriter.buffer[:])).To(Equal("Go"))
 			})
 
 			It("should exit '0'", func() {
@@ -51,11 +50,47 @@ var _ = Describe("Detect", func() {
 			})
 		})
 
-		Context("There is not a .go file present in the root", func() {
-			It("should output nothing to stdout", func() {
-				Detect(fakeWriter, buildDir)
+		Context("There is a Godeps file present in the root", func() {
+			var tmpGoFile *os.File
 
-				Ω(fakeWriter.buffer).To(Equal([]byte("")))
+			JustBeforeEach(func() {
+				tmpGoFile, _ = os.Create(buildDir + string(os.PathSeparator) + "Godeps")
+				defer tmpGoFile.Close()
+			})
+
+			It("should output 'Go' to writer", func() {
+				Detect(fakeWriter, buildDir)
+				Ω(string(fakeWriter.buffer[:])).To(Equal("Go"))
+			})
+
+			It("should exit '0'", func() {
+				exit := Detect(fakeWriter, buildDir)
+				Ω(exit).To(Equal(0))
+			})
+		})
+
+		Context("There is a Godeps folder present in the root", func() {
+			JustBeforeEach(func() {
+				if err := os.MkdirAll(buildDir+string(os.PathSeparator)+"Godeps", 0777); err != nil {
+					Fail(err.Error())
+				}
+			})
+
+			It("should output 'Go' to writer", func() {
+				Detect(fakeWriter, buildDir)
+				Ω(string(fakeWriter.buffer[:])).To(Equal("Go"))
+			})
+
+			It("should exit '0'", func() {
+				exit := Detect(fakeWriter, buildDir)
+				Ω(exit).To(Equal(0))
+			})
+		})
+
+		Context("There is not a '.go' or 'Godeps' file, or a 'Godeps' folder present in the root", func() {
+			It("should output 'No Go' to Writer", func() {
+				Detect(fakeWriter, buildDir)
+				Ω(string(fakeWriter.buffer[:])).To(Equal("No Go"))
 			})
 
 			It("should exit '1'", func() {
