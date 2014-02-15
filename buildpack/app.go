@@ -32,7 +32,11 @@ func CreateApp() *cli.App {
 			ShortName: "c",
 			Usage:     "prepare Go runtime and compile application",
 			Action: func(c *cli.Context) {
-				compile.Compile()
+				buildDir := c.Args()[0]
+				cacheDir := c.Args()[1]
+				version := compile.DetectVersion(buildDir)
+				exit := compile.Compile(buildDir, cacheDir, version)
+				os.Exit(exit)
 			},
 		},
 		{

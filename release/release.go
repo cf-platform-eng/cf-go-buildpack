@@ -5,5 +5,5 @@ import (
 )
 
 func Release() {
-	fmt.Println("release!")
+	fmt.Println("--- {}")
 }
