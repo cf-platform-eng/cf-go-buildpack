@@ -2,7 +2,9 @@ package compile
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"path"
 	"runtime"
 	"strings"
 
@@ -15,11 +17,18 @@ func Compile(buildDir string, cacheDir string, version *GoVersion) int {
 		return 1
 	}
 
-	sep := string(os.PathSeparator)
-
-	if e, _ := exists(cacheDir + sep + version.Version + sep + "go"); e {
+	if e, _ := util.Exists(path.Join(cacheDir, version.Version, "go")); e {
 		fmt.Println("-----> Using", version.Version)
 	}
+
+	os.MkdirAll(path.Join(cacheDir, version.Version), 0777)
+	out, _ := os.Create(path.Join(cacheDir, version.Version, goFile(version)))
+	defer out.Close()
+
+	resp, _ := http.Get(goUrl(version))
+	defer resp.Body.Close()
+
+	// n, _ := io.Copy(out, resp.Body)
 
 	return 0
 }
@@ -41,22 +50,15 @@ func DetectVersion(buildDir string) *GoVersion {
 	return version
 }
 
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
+func goUrl(version *GoVersion) string {
+	return "http://go.googlecode.com/files/" + goFile(version)
 }
 
-func goUrl(version *GoVersion) string {
+func goFile(version *GoVersion) string {
 	arch := version.Architecture
 	if version.Platform == "darwin" && !strings.HasPrefix(version.Version, "go1.0") && !strings.HasPrefix(version.Version, "go1.1") {
 		arch = arch + "-osx10.8"
 	}
 
-	return "http://go.googlecode.com/files/" + version.Version + "." + version.Platform + "-" + arch + ".tar.gz"
+	return version.Version + "." + version.Platform + "-" + arch + ".tar.gz"
 }

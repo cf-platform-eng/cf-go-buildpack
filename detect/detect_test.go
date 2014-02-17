@@ -3,6 +3,7 @@ package detect_test
 import (
 	"io/ioutil"
 	"os"
+	"path"
 	. "github.com/cf-platform-eng/cf-go-buildpack/detect"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +23,7 @@ var _ = Describe("Detect", func() {
 	var fakeWriter *FakeWriter
 
 	BeforeEach(func() {
-		buildDir, _ = ioutil.TempDir("/tmp", "cf_go_bp")
+		buildDir, _ = ioutil.TempDir("", "cf_go_bp")
 		fakeWriter = new(FakeWriter)
 	})
 
@@ -35,7 +36,7 @@ var _ = Describe("Detect", func() {
 			var tmpGoFile *os.File
 
 			JustBeforeEach(func() {
-				tmpGoFile, _ = os.Create(buildDir + string(os.PathSeparator) + "hello.go")
+				tmpGoFile, _ = os.Create(path.Join(buildDir, "hello.go"))
 				defer tmpGoFile.Close()
 			})
 
@@ -54,7 +55,7 @@ var _ = Describe("Detect", func() {
 			var tmpGoFile *os.File
 
 			JustBeforeEach(func() {
-				tmpGoFile, _ = os.Create(buildDir + string(os.PathSeparator) + "Godeps")
+				tmpGoFile, _ = os.Create(path.Join(buildDir, "Godeps"))
 				defer tmpGoFile.Close()
 			})
 
@@ -71,7 +72,7 @@ var _ = Describe("Detect", func() {
 
 		Context("There is a Godeps folder present in the root", func() {
 			JustBeforeEach(func() {
-				if err := os.MkdirAll(buildDir+string(os.PathSeparator)+"Godeps", 0777); err != nil {
+				if err := os.MkdirAll(path.Join(buildDir, "Godeps"), 0777); err != nil {
 					Fail(err.Error())
 				}
 			})
