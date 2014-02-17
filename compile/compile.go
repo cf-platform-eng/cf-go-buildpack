@@ -21,14 +21,14 @@ func Compile(buildDir string, cacheDir string, version *GoVersion) int {
 		fmt.Println("-----> Using", version.Version)
 	}
 
-	os.MkdirAll(path.Join(cacheDir, version.Version), 0777)
-	out, _ := os.Create(path.Join(cacheDir, version.Version, goFile(version)))
+	os.MkdirAll(path.Join(cacheDir, version.Version), 0755)
+	out, _ := os.Create(path.Join(cacheDir, version.Version, version.Name()))
 	defer out.Close()
 
-	resp, _ := http.Get(goUrl(version))
+	resp, _ := http.Get(version.Url())
 	defer resp.Body.Close()
 
-	// n, _ := io.Copy(out, resp.Body)
+	util.ExtractTarGz(path.Join(cacheDir, version.Version), resp.Body, true)
 
 	return 0
 }
@@ -50,11 +50,11 @@ func DetectVersion(buildDir string) *GoVersion {
 	return version
 }
 
-func goUrl(version *GoVersion) string {
-	return "http://go.googlecode.com/files/" + goFile(version)
+func (version *GoVersion) Url() string {
+	return "http://go.googlecode.com/files/" + version.Name()
 }
 
-func goFile(version *GoVersion) string {
+func (version *GoVersion) Name() string {
 	arch := version.Architecture
 	if version.Platform == "darwin" && !strings.HasPrefix(version.Version, "go1.0") && !strings.HasPrefix(version.Version, "go1.1") {
 		arch = arch + "-osx10.8"
