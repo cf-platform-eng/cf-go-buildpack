@@ -1,3 +1,5 @@
+# cf-go-buildpack is no longer actively maintained by VMware.
+
 # Cloud Foundry Go Buildpack
 
 ## Overview
